@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard | GlobeTrotter</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family:"Segoe UI", system-ui, sans-serif;
+}
+
+body{
+  margin:0;
+  background:linear-gradient(135deg, #eef2ff, #f8f9ff);
+  min-height:100vh;
+}
+
+/* NAVBAR */
+nav{
+  background:white;
+  padding:18px 40px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 4px 12px rgba(0,0,0,0.06);
+}
+
+nav h2{
+  margin:0;
+}
+
+nav button{
+  background:#4f8cff;
+  border:none;
+  color:white;
+  padding:10px 16px;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+/* MAIN */
+.container{
+  max-width:1000px;
+  margin:50px auto;
+  padding:0 20px;
+}
+
+.section{
+  background:white;
+  padding:30px;
+  border-radius:24px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.1);
+  margin-bottom:30px;
+}
+
+.section h3{
+  margin-bottom:20px;
+}
+
+/* FORM */
+.form-row{
+  display:flex;
+  gap:14px;
+  margin-bottom:14px;
+}
+
+input{
+  width:100%;
+  padding:14px 16px;
+  border-radius:14px;
+  border:1px solid #ddd;
+  font-size:1rem;
+}
+
+input:focus{
+  outline:none;
+  border-color:#4f8cff;
+}
+
+button.primary{
+  background:#4f8cff;
+  color:white;
+  border:none;
+  padding:14px 18px;
+  border-radius:16px;
+  font-size:1rem;
+  cursor:pointer;
+}
+
+/* TRIPS */
+.trip{
+  background:#f7f9fc;
+  padding:18px 20px;
+  border-radius:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:14px;
+}
+
+.trip span{
+  font-weight:600;
+}
+
+.trip button{
+  background:white;
+  border:1px solid #4f8cff;
+  color:#4f8cff;
+  padding:8px 14px;
+  border-radius:12px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+  <h2>🌍 GlobeTrotter</h2>
+  <button onclick="logout()">Logout</button>
+</nav>
+
+<div class="container">
+
+  <!-- CREATE TRIP -->
+  <div class="section">
+    <h3>Create New Trip</h3>
+
+    <input id="tripName" placeholder="Trip name">
+
+    <div class="form-row">
+      <input id="startDate" type="date">
+      <input id="endDate" type="date">
+    </div>
+
+    <button class="primary" onclick="createTrip()">Add Trip</button>
+  </div>
+
+  <!-- TRIP LIST -->
+  <div class="section">
+    <h3>Your Trips</h3>
+    <div id="tripList"></div>
+  </div>
+
+</div>
+
+<script>
+const BASE="http://localhost:5000";
+const user=JSON.parse(localStorage.getItem("user"));
+
+if(!user){
+  location.href="login.html";
+}
+
+function logout(){
+  localStorage.clear();
+  location.href="login.html";
+}
+
+async function load(){
+  const r=await fetch(BASE+"/api/trips/"+user.user_id);
+  const t=await r.json();
+  tripList.innerHTML="";
+
+  t.forEach(x=>{
+    const div=document.createElement("div");
+    div.className="trip";
+
+    div.innerHTML = `
+      <span>${x.trip_name}</span>
+      <button>View Itinerary</button>
+    `;
+
+    div.querySelector("button").onclick=()=>{
+      localStorage.setItem("trip",JSON.stringify(x));
+      location.href="itinerary.html";
+    };
+
+    tripList.appendChild(div);
+  });
+}
+
+async function createTrip(){
+  if(!tripName.value || !startDate.value || !endDate.value){
+    alert("All fields required");
+    return;
+  }
+
+  await fetch(BASE+"/api/trips",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      user_id:user.user_id,
+      trip_name:tripName.value,
+      start_date:startDate.value,
+      end_date:endDate.value,
+      description:""
+    })
+  });
+
+  tripName.value="";
+  load();
+}
+
+load();
+</script>
+
+</body>
+</html>

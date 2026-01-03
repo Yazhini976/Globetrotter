@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Signup | GlobeTrotter</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family:"Segoe UI", system-ui, sans-serif;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:linear-gradient(135deg, #eef2ff, #f8f9ff);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* CARD */
+.card{
+  width:420px;
+  padding:40px 34px;
+  border-radius:26px;
+  background:white;
+  box-shadow:0 30px 70px rgba(0,0,0,0.12);
+  text-align:center;
+}
+
+/* LOGO */
+.logo{
+  font-size:2rem;
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+.subtitle{
+  color:#666;
+  margin-bottom:28px;
+  font-size:0.95rem;
+}
+
+/* INPUTS */
+input{
+  width:100%;
+  padding:15px 16px;
+  margin-bottom:14px;
+  border-radius:14px;
+  border:1px solid #ddd;
+  font-size:1rem;
+}
+
+input:focus{
+  outline:none;
+  border-color:#4f8cff;
+}
+
+/* BUTTON */
+button{
+  width:100%;
+  padding:15px;
+  margin-top:10px;
+  border:none;
+  border-radius:16px;
+  background:#4f8cff;
+  color:white;
+  font-size:1rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 30px rgba(79,140,255,0.35);
+}
+
+/* LINKS */
+.links{
+  margin-top:18px;
+  font-size:0.9rem;
+}
+
+.links a{
+  text-decoration:none;
+  color:#4f8cff;
+  font-weight:500;
+}
+
+.footer{
+  margin-top:26px;
+  font-size:0.85rem;
+  color:#888;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <div class="logo">🌍 GlobeTrotter</div>
+  <div class="subtitle">Create your account</div>
+
+  <input id="name" type="text" placeholder="Full name">
+  <input id="email" type="email" placeholder="Email address">
+  <input id="password" type="password" placeholder="Password">
+
+  <button onclick="signup()">Create Account</button>
+
+  <div class="links">
+    Already have an account? <a href="login.html">Login</a>
+  </div>
+
+  <div class="footer">
+    Plan ✈️ Travel 🧳 Enjoy 🌍
+  </div>
+</div>
+
+<script>
+const BASE = "http://localhost:5000";
+
+async function signup(){
+  if(!name.value || !email.value || !password.value){
+    alert("All fields are required");
+    return;
+  }
+
+  const r = await fetch(BASE + "/api/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: name.value,
+      email: email.value,
+      password: password.value
+    })
+  });
+
+  const d = await r.json();
+  alert(d.message);
+
+  if(d.message === "Signup successful"){
+    location.href = "login.html";
+  }
+}
+</script>
+
+</body>
+</html>
